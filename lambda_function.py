@@ -2,6 +2,7 @@ import json
 import boto3
 import random
 
+
 def unused_eip():
     client = boto3.client('ec2')
     response = client.describe_addresses()
@@ -19,8 +20,6 @@ def unused_eip():
             print('Elastic IP {} is unused'.format(address['PublicIp']))
             unused_eips.append("{}".format(address['AllocationId']))
             return unused_eips
-
-            
 def association_eip(instance_id, allocation_id):
     client = boto3.client('ec2')
     response = client.associate_address(
@@ -30,7 +29,12 @@ def association_eip(instance_id, allocation_id):
     print('Change eip to  instance id: %s' % instance_id)
 
 def lambda_handler(event, context):
+    print(event)
     message = json.loads(event['Records'][0]['Sns']['Message'])
-    instance_id = message['detail']['EC2InstanceId']
-    allocation_id = random.choice(unused_eip())
-    association_eip(instance_id,allocation_id)
+    instance_id = message['EC2InstanceId']
+    if unused_eip() == None:
+        print("There are no unused Elastic IP")
+        exit()
+    else:
+        allocation_id = random.choice(unused_eip())
+        association_eip(instance_id,allocation_id)
