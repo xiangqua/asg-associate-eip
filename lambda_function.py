@@ -19,8 +19,7 @@ def unused_eip():
             print('Elastic IP {} is unused'.format(address['PublicIp']))
             unused_eips.append("{}".format(address['AllocationId']))
             return unused_eips
-        else:
-            print("allocate new eip...")
+
             
 def association_eip(instance_id, allocation_id):
     client = boto3.client('ec2')
